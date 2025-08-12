@@ -34,7 +34,6 @@ async def chat_with_agent(request: ChatRequest):
     data = request.payload
     user = request.user
     
-    print(user)
     session_id = data.session_id
     user_input = data.message
 
@@ -43,14 +42,12 @@ async def chat_with_agent(request: ChatRequest):
     # Add system message nếu chưa có
     # system_messages = [m for m in memory.messages if isinstance(m, SystemMessage)]
     if user:
-        print("1")
         state = "đã đăng nhập"
         name = user.ten
         birthday = user.namsinh
         email= user.email
         sex= user.gioitinh
     else:
-        print("2")
         state = "chưa đăng nhập"
         name = "chưa đăng nhập"
         birthday = "chưa đăng nhập"

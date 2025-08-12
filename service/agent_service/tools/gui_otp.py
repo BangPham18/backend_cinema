@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-print(os.getenv("MAIL_USERNAME"), os.getenv("MAIL_PORT"))
 conf = ConnectionConfig(
     MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
     MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),

@@ -13,7 +13,6 @@ def dang_nhap(state: AgentState):
 
     # Gán vào biến
     dang_nhap, name, birthday, email, sex = matches
-    print(dang_nhap, name, birthday, email, sex)
     return {"dang_nhap": dang_nhap,
             "name": name,
             "birthday": birthday,

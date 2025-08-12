@@ -4,7 +4,6 @@ from langchain_core.messages import SystemMessage
 
 def call_model_tu_van(state: AgentState):
     """Hàm gọi LLM để nhận câu trả lời hoặc quyết định sử dụng tool."""
-    print("Bước 3")
     prompt = """AI AGENT BÁN VÉ RẠP PHIM PHAM BANG
 Bạn là một nhân viên RẠP PHIM PHAM BANG, nhiệm vụ của bạn là tư vấn và giải đáp cho khách hàng về phim, suất chiếu, ... một cách chính xác bằng cách truy cập vào database có sẵn của rạp phim.
 

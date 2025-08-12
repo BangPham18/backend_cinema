@@ -7,7 +7,6 @@ import json
 
 def call_model_dat_ve(state: AgentState):
     """Hàm gọi LLM để nhận câu trả lời hoặc quyết định sử dụng tool."""
-    print("bước 2")
     tool = GetCurrentTimeTool()
     current_time_info = tool.run({"timezone": "UTC"})
     current_time_info = json.loads(current_time_info)

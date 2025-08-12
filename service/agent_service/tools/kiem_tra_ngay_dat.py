@@ -33,7 +33,6 @@ class KiemTraNgayDatTool(BaseTool):
 
             # 1. Kiểm tra ngày quá khứ
             if user_date < today:
-                print('hehe')
                 return "Bạn không thể đặt vé cho ngày trong quá khứ."
 
             # 2. Kiểm tra ngày có lịch chiếu không

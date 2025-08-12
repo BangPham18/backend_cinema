@@ -58,7 +58,6 @@ class KiemTraPhimTonTaiTool(BaseTool):
                 return f"Phim '{', '.join([phim.ten_phim for phim in result])}' có trong hệ thống. Bạn muốn biết lịch chiếu phim này chứ?"
             else:
                 # Nếu không tìm thấy, gọi tool get_phim_hot
-                print(f"Không tìm thấy phim '{ten_phim}'. Đang tìm phim hot để gợi ý...")
                 hot_movies_tool = GetPhimHotTool()
                 hot_movies_list = hot_movies_tool._run() # Chạy tool để lấy danh sách phim hot
 

@@ -1,0 +1,22 @@
+# Core backend
+fastapi
+uvicorn
+sqlalchemy
+psycopg[binary]
+
+# AI agent
+langchain
+langchain-google-genai
+langgraph
+langsmith
+langchain-postgres
+langchain-community
+
+# Utils
+python-dotenv
+psycopg2-binary
+fastapi-mail
+redis
+passlib
+python-jose[cryptography]
+bcrypt

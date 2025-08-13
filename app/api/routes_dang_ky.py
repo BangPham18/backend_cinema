@@ -2,14 +2,14 @@ from app.core.models import TaiKhoan, KhachHang
 from app.core.security import hash_password
 import re
 import uuid
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from app.core.database import get_session
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from typing import Optional
 
 class RegisterRequest(BaseModel):
-    email: str
+    email: EmailStr
     password: str
     ten: str
     nam_sinh: Optional[int] = None
@@ -22,9 +22,6 @@ router = APIRouter()
 def register(data: RegisterRequest):
     session: Session = get_session()
     try:
-        # 1. Kiểm tra định dạng email
-        if not re.match(r"^[\w\.-]+@gmail\.com$", data.email):
-            raise HTTPException(status_code=400, detail="Email phải có dạng @gmail.com")
 
         # 2. Kiểm tra email đã tồn tại chưa
         existing_user = session.query(TaiKhoan).filter(TaiKhoan.email == data.email).first()

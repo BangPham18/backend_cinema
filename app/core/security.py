@@ -7,19 +7,22 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.core.models import TaiKhoan
 from app.core.database import get_session
+import hashlib
 
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60  # Token hết hạn sau 60 phút
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["pbkdf2_sha256", "bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    prehashed = hashlib.sha256(password.encode("utf-8")).hexdigest()
+    return pwd_context.hash(prehashed)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    prehashed = hashlib.sha256(plain_password.encode("utf-8")).hexdigest()
+    return pwd_context.verify(prehashed, hashed_password)
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()

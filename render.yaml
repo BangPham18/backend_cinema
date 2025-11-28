@@ -1,0 +1,28 @@
+services:
+  # Web Service (FastAPI)
+  - type: web
+    name: backend-cinema
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: DB_CONNECTION_STRING
+        sync: false # User needs to fill this in Render Dashboard
+
+  # Cron Job (ETL Pipeline)
+  - type: cron
+    name: etl-movie-schedule
+    env: python
+    schedule: "0 0 * * 0" # Runs every Sunday at midnight
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m scripts.etl_tmdb
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: DB_CONNECTION_STRING
+        fromService:
+          type: web
+          name: backend-cinema
+          envVarKey: DB_CONNECTION_STRING

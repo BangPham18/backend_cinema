@@ -20,3 +20,5 @@ redis
 passlib
 python-jose[cryptography]
 bcrypt
+requests
+alembic

@@ -7,9 +7,22 @@ import re
 def classify_mesage(state: AgentState):
     # Phân loại tin nhắn
     all_mess = [m for m in state['messages'] if not isinstance(m, SystemMessage)]
-    content = [mess.content for mess in all_mess]
-
-    content_str = "\n".join(content)
+    
+    content_list = []
+    for mess in all_mess:
+        if isinstance(mess.content, str):
+            content_list.append(mess.content)
+        elif isinstance(mess.content, list):
+            # Handle list content (e.g., from Gemini with text parts)
+            text_parts = []
+            for item in mess.content:
+                if isinstance(item, dict) and 'text' in item:
+                    text_parts.append(item['text'])
+                elif isinstance(item, str):
+                    text_parts.append(item)
+            content_list.append(" ".join(text_parts))
+            
+    content_str = "\n".join(content_list)
 
     classifier_llm = llm.with_structured_output(MessageClassifier)
 

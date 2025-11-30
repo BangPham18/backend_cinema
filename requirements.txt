@@ -15,10 +15,10 @@ langchain-community
 # Utils
 python-dotenv
 psycopg2-binary
-fastapi-mail
 redis
 passlib
 python-jose[cryptography]
 bcrypt
 requests
 alembic
+fastapi-mail>=1.4.1

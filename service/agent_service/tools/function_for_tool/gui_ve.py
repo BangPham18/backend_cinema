@@ -1,4 +1,5 @@
 from pydantic import EmailStr
+import traceback
 from sqlalchemy.orm import Session
 from app.core.database import get_session
 from app.core.models import Ve, LichChieu, Phim, Ghe
@@ -53,6 +54,8 @@ def gui_lai_ve(email: EmailStr, ma_ves: List[str]) -> str:
         send_email_html(to=email, subject=subject, body=body)
         return f"✅ Đã gửi lại {len(ve_list)} vé qua email."
     except Exception as e:
+        traceback.print_exc()
+        print(f"❌ DEBUG ERROR (gui_ve): {str(e)}")
         return f"❌ Lỗi khi gửi lại vé: {str(e)}"
     finally:
         db.close()

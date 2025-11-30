@@ -1,5 +1,6 @@
 import random
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+import traceback
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from pydantic import BaseModel, EmailStr, Field
 from typing import Type
 from langchain.tools import BaseTool
@@ -50,10 +51,12 @@ class ToolGuiOTP(BaseTool):
                     subject="Mã OTP xác nhận đặt vé 🎟️",
                     recipients=[email],
                     body=f"Mã OTP của bạn là: {otp}. Vui lòng cung cấp mã này để xác nhận đặt vé.",
-                    subtype="plain"
+                    subtype=MessageType.html
                 )
                 fm = FastMail(conf)
                 await fm.send_message(message)
                 return "Đã gửi mã OTP đến email của bạn. Vui lòng xác nhận."
         except Exception as e:
+            traceback.print_exc()
+            print(f"❌ DEBUG ERROR: {str(e)}")
             return f"Lỗi gửi OTP: {str(e)}"

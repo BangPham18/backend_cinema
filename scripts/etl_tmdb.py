@@ -4,6 +4,7 @@ import random
 import sys
 import os
 from datetime import datetime, timedelta, time
+from app.core.config import settings
 
 # Add project root to path to allow imports from app
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -15,13 +16,12 @@ from app.core.models.lichchieu import LichChieu
 from app.core.models.phongphim import PhongPhim
 
 # Configuration
-API_KEY = "849b291dac43bbb30be7f24c983169d3"
 BASE_URL = "https://api.themoviedb.org/3"
 IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
 
 def fetch_genres():
     url = f"{BASE_URL}/genre/movie/list"
-    params = {"api_key": API_KEY, "language": "vi-VN"}
+    params = {"api_key": settings.TMDB_API_KEY, "language": "vi-VN"}
     response = requests.get(url, params=params)
     if response.status_code == 200:
         genres = response.json().get("genres", [])

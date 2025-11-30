@@ -1,13 +1,14 @@
 # app/core/redis_client.py
 import redis
+from app.core.config import settings
 
 # Redis default: localhost:6379
 r = redis.Redis(
-    host='redis-14536.c114.us-east-1-4.ec2.redns.redis-cloud.com',
-    port=14536,
+    host=settings.REDIS_HOST,
+    port=settings.REDIS_PORT,
     decode_responses=True,
-    username="default",
-    password="WOPz560tYgi8zMZsllUvSN5DifvF8woW",
+    username=settings.REDIS_USERNAME,
+    password=settings.REDIS_PASSWORD,
 )
 
 def set_otp(email: str, otp: str, expire_seconds: int = 300):

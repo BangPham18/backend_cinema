@@ -10,14 +10,24 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+
+mail_port = int(os.getenv("MAIL_PORT", 587))
+# Determine security settings based on port if not explicitly set
+# Port 587 usually requires STARTTLS, Port 465 usually requires SSL/TLS
+default_starttls = str(mail_port == 587)
+default_ssl_tls = str(mail_port == 465)
+
+mail_starttls = os.getenv("MAIL_STARTTLS", default_starttls).lower() == "true"
+mail_ssl_tls = os.getenv("MAIL_SSL_TLS", default_ssl_tls).lower() == "true"
+
 conf = ConnectionConfig(
     MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
     MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
     MAIL_FROM=os.getenv("MAIL_FROM"),
-    MAIL_PORT=int(os.getenv("MAIL_PORT")),
+    MAIL_PORT=mail_port,
     MAIL_SERVER=os.getenv("MAIL_SERVER"),
-    MAIL_STARTTLS=False,
-    MAIL_SSL_TLS=True,
+    MAIL_STARTTLS=mail_starttls,
+    MAIL_SSL_TLS=mail_ssl_tls,
     USE_CREDENTIALS=True
 )
 

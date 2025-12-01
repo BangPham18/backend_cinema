@@ -1,6 +1,5 @@
 import random
 import traceback
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from pydantic import BaseModel, EmailStr, Field
 from typing import Type
 from langchain.tools import BaseTool
@@ -8,32 +7,15 @@ from scripts.redis_client import set_otp
 import asyncio
 from dotenv import load_dotenv
 import os
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
 
 load_dotenv()
-
-mail_port = int(os.getenv("MAIL_PORT", 587))
-# Determine security settings based on port if not explicitly set
-# Port 587 usually requires STARTTLS, Port 465 usually requires SSL/TLS
-default_starttls = str(mail_port == 587)
-default_ssl_tls = str(mail_port == 465)
-
-mail_starttls = os.getenv("MAIL_STARTTLS", default_starttls).lower() == "true"
-mail_ssl_tls = os.getenv("MAIL_SSL_TLS", default_ssl_tls).lower() == "true"
-
-conf = ConnectionConfig(
-    MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
-    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
-    MAIL_FROM=os.getenv("MAIL_FROM"),
-    MAIL_PORT=mail_port,
-    MAIL_SERVER=os.getenv("MAIL_SERVER"),
-    MAIL_STARTTLS=mail_starttls,
-    MAIL_SSL_TLS=mail_ssl_tls,
-    USE_CREDENTIALS=True
-)
 
 class GuiOTPInput(BaseModel):
     email: EmailStr = Field(description="Email khách hàng để gửi mã OTP")
     state: str = Field(description='Trạng thái đăng nhập của khách hàng')
+
 class ToolGuiOTP(BaseTool):
     name:str = "gui_otp"
     description:str = """Khi khách hàng xác nhận đặt vé. Gửi mã OTP đến email khách hàng để xác nhận đặt vé.
@@ -57,15 +39,47 @@ class ToolGuiOTP(BaseTool):
                 otp = str(random.randint(1000, 9999))
                 set_otp(email, otp, expire_seconds=300)  # Lưu vào Redis 5 phút
 
-                message = MessageSchema(
-                    subject="Mã OTP xác nhận đặt vé 🎟️",
-                    recipients=[email],
-                    body=f"Mã OTP của bạn là: {otp}. Vui lòng cung cấp mã này để xác nhận đặt vé.",
-                    subtype=MessageType.html
+                # Cấu hình Brevo API
+                configuration = sib_api_v3_sdk.Configuration()
+                api_key = os.getenv("BREVO_API_KEY")
+                if not api_key:
+                    return "Lỗi: Chưa cấu hình BREVO_API_KEY"
+                
+                configuration.api_key['api-key'] = api_key
+                api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+                
+                sender_email = os.getenv("MAIL_FROM", "no-reply@example.com")
+                sender_name = "Cinema Chatbot"
+                
+                subject = "Mã OTP xác nhận đặt vé 🎟️"
+                html_content = f"""
+                <html>
+                    <body>
+                        <h3>Mã OTP của bạn là: <strong style="font-size: 24px; color: #4CAF50;">{otp}</strong></h3>
+                        <p>Vui lòng cung cấp mã này để xác nhận đặt vé.</p>
+                        <p>Mã có hiệu lực trong 5 phút.</p>
+                    </body>
+                </html>
+                """
+                
+                sender = {"name": sender_name, "email": sender_email}
+                to = [{"email": email}]
+                
+                send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+                    to=to,
+                    sender=sender,
+                    subject=subject,
+                    html_content=html_content
                 )
-                fm = FastMail(conf)
-                await fm.send_message(message)
-                return "Đã gửi mã OTP đến email của bạn. Vui lòng xác nhận."
+
+                try:
+                    api_response = api_instance.send_transac_email(send_smtp_email)
+                    print(f"Brevo Response: {api_response}")
+                    return "Đã gửi mã OTP đến email của bạn. Vui lòng xác nhận."
+                except ApiException as e:
+                    print(f"Exception when calling TransactionalEmailsApi->send_transac_email: {e}")
+                    return f"Lỗi gửi OTP qua API: {e}"
+
         except Exception as e:
             traceback.print_exc()
             print(f"❌ DEBUG ERROR: {str(e)}")

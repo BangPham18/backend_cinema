@@ -1,2 +1,4 @@
 .env
 venv/
+test_brevo_api.py
+test_script_send_email.py
